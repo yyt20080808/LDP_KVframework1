@@ -74,9 +74,8 @@ def read_true_statsics():
         mean[k] = normalize_to_neg_one_to_one(arr).tolist()
     return frequency, mean
 
-
 if __name__ == "__main__":
-    k_pop_IDs = ['B000ASDGK8', 'B000UVZU1S', 'B004Z40048', 'B001AO0WCG', 'B0046VGPHQ', 'B001MA0QY2', 'B002WTC38O',
+    k_pop_IDs = ['B00176B9JC', 'B000ASDGK8', 'B000UVZU1S', 'B004Z40048', 'B001AO0WCG', 'B0046VGPHQ', 'B001MA0QY2', 'B002WTC38O',
                  'B00147FGJ8', 'B0056GDG90', 'B004OHQR1Q', 'B007BLN17K', 'B001RMP7M6', 'B003BQ6QXK', 'B0047ETXD0',
                  'B00121UVU0', 'B0069FDR96', 'B000142FVW', 'B000FS05VG', 'B003V265QW', 'B003S516XO', 'B006SVCY6I',
                  'B000TKH6G2', 'B0002JKPA4', 'B0043OYFKU', 'B00150LT40', 'B002JSL6QI', 'B000L596FE', 'B008LDFU26',
@@ -85,17 +84,18 @@ if __name__ == "__main__":
                  'B0001ZYLAO', 'B008MP481M', 'B009T47YZ2', 'B00IALDHDI', 'B005BF1M10', 'B001JKTTVQ', 'B003UH0528',
                  'B000UM2KCY', 'B000EVGQ0S', 'B006L1DNWY', 'B004GQZX4M', 'B004INUWX0', 'B00188IFHS', 'B00I073WLE',
                  'B00067YSLO', 'B0058E3XJI', 'B00CFRBIC0', 'B009GYVMAS', 'B006IBM21K', 'B002JPJ2ZS', 'B009RNUH4A',
-                 'B007Q0WW0S', 'B001UHN0I6', 'B007TNHQOY', 'B00176B9JC']
+                 'B007Q0WW0S', 'B001UHN0I6', 'B007TNHQOY', ]
 
     #
-    epslions = [0.5,1, 1.5, 2, 2.5, 3, 4]
+    # epslions = [0.5,1, 1.5, 2, 2.5, 3, 4]
+    epslions = [2]
     m = len(epslions)
-    muld = 1000
+    muld = 10000
     our_data, padding_l_our = read_padding_file(k_pop_IDs, True)
     pckv_data, padding_l = read_padding_file(k_pop_IDs, False)
     real_f_lists, real_mean_lists = read_true_statsics()
     keys = real_f_lists.keys()
-    n = 30
+    n = 5
     MEGRR_f, MEOLH_f, PCKVUE_f, JVEPM_f, ours_f = np.zeros((n, m)), np.zeros((n, m)), np.zeros((n, m)), np.zeros(
         (n, m)), np.zeros((n, m))
     MEGRR_v, MEOLH_v, PCKVUE_v, JVEPM_v, ours_v = np.zeros((n, m)), np.zeros((n, m)), np.zeros((n, m)), np.zeros(
