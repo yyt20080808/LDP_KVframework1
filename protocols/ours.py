@@ -161,11 +161,12 @@ def myEM_one(n, ns_hist, transform, max_iteration, loglikelihood_threshold):
             theta = np.copy(P / sum(P))
             theta[0:n] = np.matmul(smoothing_matrix, theta[0:n])
             if r == 200 or r == 1000:
-                if calSum(theta[0:n]) < -0.3 and sum(theta[int(n / 2):n]) / sum(theta[0:n]) < 1 / 5:
-                    theta[int(n / 4):n] = 0
-                    # print("effect small")
-                elif calSum(theta[0:n]) > 0.1 and sum(theta[0:int(n / 2)]) / sum(theta[0:n]) < 1 / 5:
-                    theta[0:int(n / 2)] = 0
+                theta[0:int(n / 2)] = 0
+                # if calSum(theta[0:n]) < -0.3 and sum(theta[int(n / 2):n]) / sum(theta[0:n]) < 1 / 5:
+                #     theta[int(n / 4):n] = 0
+                #     # print("effect small")
+                # elif calSum(theta[0:n]) > 0.1 and sum(theta[0:int(n / 2)]) / sum(theta[0:n]) < 1 / 5:
+                #     theta[0:int(n / 2)] = 0
                     # print("effect big")
             theta = theta / sum(theta)
 

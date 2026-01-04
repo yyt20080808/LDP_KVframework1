@@ -48,7 +48,7 @@ if __name__ == "__main__":
     epslions = [2]
 
     m = len(epslions)
-    n = 10
+    n = 25
     MEGRR_f, MEOLH_f, PCKVUE_f, JVEPM_f, ours_f = np.zeros((n, m)), np.zeros((n, m)), np.zeros((n, m)), np.zeros(
         (n, m)), np.zeros((n, m))
     MEGRR_v, MEOLH_v, PCKVUE_v, JVEPM_v, ours_v = np.zeros((n, m)), np.zeros((n, m)), np.zeros((n, m)), np.zeros(
@@ -78,8 +78,7 @@ if __name__ == "__main__":
             PCKVUE_f[i, j] = round(mse_PCKVUE_f[j], 10)
             PCKVUE_v[i, j] = round(mse_PCKVUE_v[j], 10)
             PCKVUE_sum[i, j] = round(mse_PCKVUE_sum[j], 10)
-    #         # # JVEPM_f[i, j] = mse_JVEPM_f[j]
-    #         # # JVEPM_v[i, j] = mse_JVEPM_v[j]
+
     #         # # #
             ours_f[i, j] = round(mse_SVE_f[j], 10)
             ours_v[i, j] = round(mse_SVE_EM_v[j], 10)
