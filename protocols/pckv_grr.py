@@ -59,8 +59,8 @@ def pckv_GRR(data, epsilonls, mul_d, real_f=0, real_mean=0, paddinglength=1):
             estimate_f = estimate_f * paddinglength
             if estimate_f > 1:
                 estimate_f = 0.9
-            elif estimate_f < 0:
-                estimate_f = 0
+            # elif estimate_f < 0:
+            #     estimate_f = 0
             mse_v += (estimate_v - real_mean) ** 2
             mse_f += (estimate_f - real_f) ** 2
             estimate_sum = estimate_v * estimate_f * n

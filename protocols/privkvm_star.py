@@ -178,16 +178,16 @@ def privkvm(epsilon, users_data, realfres, realmeans,num_index=100):
     return fre_mses / num_index, mean_mses / num_index
 
 if __name__ == "__main__":
-    # real_fres, real_means = calculate_key_statistics("../datasets/gaussian_dataset/user_raw_data.jsonl")
-    # user_data = read_data("../datasets/gaussian_dataset/uniform_random_sampling.txt")
+    real_fres, real_means = calculate_key_statistics("../datasets/gaussian_dataset/user_raw_data.jsonl")
+    user_data = read_data("../datasets/gaussian_dataset/uniform_random_sampling.txt")
     # privkvm(4, user_data, real_fres, real_means)
 
     # real_fres, real_means = calculate_key_statistics("../datasets/powerlaw_dataset/user_raw_data.jsonl")
     # user_data = read_data("../datasets/powerlaw_dataset/uniform_random_sampling.txt")
-    real_fres, real_means = read_stastistics("../datasets/movie/movie_top_f.txt","../datasets/movie/movie_top_mean.txt")
-    user_data = read_data("../datasets/movie/uniform_random_sampling.txt")
+    # real_fres, real_means = read_stastistics("../datasets/movie/movie_top_f.txt","../datasets/movie/movie_top_mean.txt")
+    # user_data = read_data("../datasets/movie/uniform_random_sampling.txt")
     res_fre, res_mean = [],[]
-    for ep in [0.5, 1, 1.5, 2, 2.5, 3, 4]:
+    for ep in [ 0.5, 1, 1.5,2.5, 2, 3, 4]:
         a,b = privkvm(ep, user_data, real_fres, real_means,num_index=40) #
         res_fre.append(a)
         res_mean.append(b)

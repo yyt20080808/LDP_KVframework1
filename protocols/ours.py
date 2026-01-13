@@ -30,7 +30,7 @@ def OURS_UE(data, epsilonls, real_f=0, real_mean=0, paddinglength=1, smooth=True
 
         for times in range(numberExperi):
             ori_samples = np.array(data[0])
-            samples = (ori_samples + 1) / 2
+            samples = (ori_samples + 1) / 2 # translate to 0~1, since the input of sw requires
             randoms = np.random.uniform(0, 1, len(samples))
 
             noisy_samples = np.zeros_like(samples)
@@ -44,19 +44,15 @@ def OURS_UE(data, epsilonls, real_f=0, real_mean=0, paddinglength=1, smooth=True
                 # observed_value.append(res_x)
             uni_randoms = np.random.uniform(-w/2, 1+w/2, len(data[1]))
             observed_value = np.concatenate((noisy_samples,uni_randoms)) # concate
-            # for _ in range(len()):
-            #     res_x = random.random() * 2 * C - C
-            #     res_all_x += res_x
-            #     observed_value.append(res_x)
 
             noisedData, _ = np.histogram(observed_value, bins=pre_bins, range=(-w/2, 1+w/2))
             maxiteration = 10000
             if smooth:
-                theta_OPM_NoS = myEM_one(pre_bins, noisedData, Matrix, maxiteration, 0.001 * ee)
+                theta_OPM_NoS = myEM_smooth_fast(pre_bins, noisedData, Matrix, maxiteration, 0.0001 * ee,paddinglength)
             else:
                 if paddinglength == 1:
                     maxiteration = 5000
-                theta_OPM_NoS = myEM_nosmooth_fast(pre_bins, noisedData, Matrix, maxiteration, 0.001 * ee)
+                theta_OPM_NoS = myEM_nosmooth_fast(pre_bins, noisedData, Matrix, maxiteration, 0.0001 * ee)
 
             estimate_f = 1 - theta_OPM_NoS[-1]
             theta_OPM_NoS = theta_OPM_NoS[0:-1]
@@ -70,13 +66,15 @@ def OURS_UE(data, epsilonls, real_f=0, real_mean=0, paddinglength=1, smooth=True
             for i in range(pre_bins):
                 estimate_v += theta_OPM_NoS[i] * i
             estimate_v = (estimate_v / pre_bins - 0.5) * 2
-            # print("EM:", real_mean, estimate_v, "estimated f:", estimate_f*paddinglength, real_f)
+
             if estimate_f * paddinglength > 1:
                 estimate_f = 0.5 / paddinglength
             estimate_sum = estimate_v * estimate_f * n * paddinglength
             mse_f.append((estimate_f * paddinglength - real_f) ** 2)  # MSE of frequency
             mse_v.append((real_mean - estimate_v) ** 2)  # MSE of vale mean
             mse_sum.append((estimate_sum - realsum * paddinglength) ** 2)
+            print("EM mean:", real_mean, estimate_v, "estimated f:", estimate_f * paddinglength, real_f)
+            print("EM sum:", estimate_sum, realsum * paddinglength)
             new_dist = theta_OPM_NoS
             mse_range.append(rangequery(real_dist, new_dist))
         res_f.append(sum(mse_f) / numberExperi)
@@ -123,84 +121,115 @@ def rangequery(a, b):
 
     return mean_squared_error
 
+def smooth_binomial_121(x):
+    """
+    Binomial [1,2,1] smoothing, but keep original zeros unchanged.
+    """
+    n = x.shape[0]
+    y = np.empty_like(x)
 
-def myEM_one(n, ns_hist, transform, max_iteration, loglikelihood_threshold):
-    smoothing_factor = 2
-    binomial_tmp = [1, 2, 1]
-    smoothing_matrix = np.zeros((n, n))
-    central_idx = int(len(binomial_tmp) / 2)
-    for i in range(int(smoothing_factor / 2)):
-        smoothing_matrix[i, : central_idx + i + 1] = binomial_tmp[central_idx - i:]
-    for i in range(int(smoothing_factor / 2), n - int(smoothing_factor / 2)):
-        smoothing_matrix[i, i - central_idx: i + central_idx + 1] = binomial_tmp
-    for i in range(n - int(smoothing_factor / 2), n):
-        remain = n - i - 1
-        smoothing_matrix[i, i - central_idx + 1:] = binomial_tmp[: central_idx + remain]
-    row_sum = np.sum(smoothing_matrix, axis=1)
-    smoothing_matrix = (smoothing_matrix.T / row_sum).T
-    transform2 = np.ones((n, n + 1))
-    for i in range(n):
-        for j in range(n):
-            transform2[i, j] = transform[i, j]
-        transform2[i, n] = 1 / n
+    if n == 1:
+        y[0] = x[0]
+        return y
 
-    sample_size = sum(ns_hist)
-    r = 0
-    theta_final = (np.ones(n + 1)) / (float(n))
-    loglikelihood_final = -10000000
-    for jjj in range(1):
+    zero_mask = (x == 0.0)
 
-        theta = (np.ones(n + 1)) / (float(n)) / 10
-        theta[0:200] = 0.000000
-        # theta[0:int(pre_bins / 9)] = 0.0000001
-        # theta[900:] = 0.0000001
-        theta[n] = 9 / 10
+    y[:] = x
 
-        theta_old = np.zeros(n + 1)
-        old_logliklihood = 0
-        while LA.norm(theta_old - theta, ord=1) > 1 / sample_size / 100 and r < max_iteration:
-            theta_old = np.copy(theta)
-            X_condition = np.matmul(transform2, theta_old)
-            TMP = transform2.T / X_condition
-            P = np.copy(np.matmul(TMP, ns_hist))
-            P = P * theta_old
+    if not zero_mask[0]:
+        y[0] = (2.0 * x[0] + 1.0 * x[1]) / 3.0
 
-            theta = np.copy(P / sum(P))
-            theta[0:n] = np.matmul(smoothing_matrix, theta[0:n])
-            if r == 200 or r == 1000:
-                theta[0:int(n / 2)] = 0
-                # if calSum(theta[0:n]) < -0.3 and sum(theta[int(n / 2):n]) / sum(theta[0:n]) < 1 / 5:
-                #     theta[int(n / 4):n] = 0
-                #     # print("effect small")
-                # elif calSum(theta[0:n]) > 0.1 and sum(theta[0:int(n / 2)]) / sum(theta[0:n]) < 1 / 5:
-                #     theta[0:int(n / 2)] = 0
-                # print("effect big")
-            theta = theta / sum(theta)
+    if not zero_mask[-1]:
+        y[-1] = (1.0 * x[-2] + 2.0 * x[-1]) / 3.0
 
-            logliklihood = np.inner(ns_hist, np.log(np.matmul(transform2, theta)))
-            imporve = logliklihood - old_logliklihood
+    if n > 2:
+        for i in range(1, n - 1):
+            if zero_mask[i]:
+                continue  # 原来是 0，保持 0
+            y[i] = (x[i - 1] + 2.0 * x[i] + x[i + 1]) / 4.0
 
-            if r > 100 and abs(imporve) < loglikelihood_threshold:
-                break
+    y[zero_mask] = 0.0
 
-            old_logliklihood = logliklihood
+    return y
 
-            r += 1
-        # print("r=", r, "noise components:", theta[n], old_logliklihood)
-        # plt.plot([i for i in range(pre_bins)], theta[0:-1])
-        # plt.show()
-        # print("sum", sum(theta))
-        if old_logliklihood > loglikelihood_final:
-            theta_final = np.copy(theta)
-            loglikelihood_final = old_logliklihood
-    return theta_final
+
+def myEM_smooth_fast(n, ns_hist, transform, max_iteration, loglikelihood_threshold,padding_l):
+    ns_hist = np.asarray(ns_hist, dtype=np.float64)
+    transform = np.asarray(transform, dtype=np.float64)
+    transform /= transform.sum(axis=0, keepdims=True)
+    # A = [transform | 1/n]
+    A = np.empty((n, n + 1), dtype=np.float64)
+    A[:, :n] = transform
+    A[:, n] = 1.0 / n
+
+
+    sample_size = ns_hist.sum()
+    eps = 1.0 / sample_size / 100.0
+
+    # initial theta
+    theta = np.ones(n + 1, dtype=np.float64) / float(n) / 10.0
+    theta[:200] = 0.0
+    if padding_l >=10:
+        theta[420:] = 0.0
+        theta[n] = 9.7 / 10.0
+    else:
+        theta[0:300] = 0.0
+        theta[n] = 9.5 / 10.0
+    theta /= theta.sum()
+
+    theta_old = theta.copy()
+    old_loglikelihood = -np.inf
+
+    for r in range(max_iteration):
+        theta_old[:] = theta
+
+        # E-step
+        X = A @ theta
+        X = np.clip(X, 1e-300, None)
+
+        w = ns_hist / X
+        g = A.T @ w
+
+        # M-step
+        theta *= g
+        s = theta.sum()
+        if s == 0.0:
+            theta[:] = 1.0 / (n + 1)
+        else:
+            theta /= s
+
+        #
+        theta[:n] = smooth_binomial_121(theta[:n])
+
+        #
+        if r == 200 or r == 1000:
+            theta[:int(n / 2)] = 0.0
+
+        #
+        theta /= theta.sum()
+
+        # loglikelihood
+        Ax = A @ theta
+        Ax = np.clip(Ax, 1e-300, None)
+        loglikelihood = np.dot(ns_hist, np.log(Ax))
+        improve = loglikelihood - old_loglikelihood
+
+        #
+        if np.sum(np.abs(theta_old - theta)) <= eps:
+            break
+        if r > 200 and abs(improve) < loglikelihood_threshold:
+            break
+
+        old_loglikelihood = loglikelihood
+    print("r",r)
+    return theta
 
 
 def myEM_nosmooth_fast(n, ns_hist, transform, max_iteration, loglikelihood_threshold):
-    ns_hist = np.asarray(ns_hist, dtype=np.float64)      # 保证是 float，除法更快更稳定
+    ns_hist = np.asarray(ns_hist, dtype=np.float64)      #
     transform = np.asarray(transform, dtype=np.float64)
 
-    # 1) 快速构造 transform2: [transform | 1/n]
+    # 1)
     A = np.empty((n, n + 1), dtype=np.float64)
     A[:, :n] = transform
     A[:, n] = 1.0 / n
@@ -208,8 +237,8 @@ def myEM_nosmooth_fast(n, ns_hist, transform, max_iteration, loglikelihood_thres
     sample_size = ns_hist.sum()
     eps = 1.0 / sample_size / 100.0
 
-    # 2) 初始化 theta
-    theta = np.ones(n + 1, dtype=np.float64) / float(n) / 100.0
+    # 2) initial theta, since we know the distribution values are 1,2,3,4,5 in amazon
+    theta = np.ones(n + 1, dtype=np.float64) / float(n)
     if max_iteration == 5000:
         theta[:102] = 0.0
         theta[103:204] = 0.0
@@ -219,24 +248,28 @@ def myEM_nosmooth_fast(n, ns_hist, transform, max_iteration, loglikelihood_thres
         theta[n] = 9.95 / 10.0
     else:
         theta[:102] = 0.0
-
-    # 归一化一次
+        theta[103:145] = 0.0
+        theta[205:245] = 0.0
+        theta[308:350] = 0.0
+        theta[411:450] = 0.0
+        theta[n] = 0.9
+    #
     theta /= theta.sum()
 
     old_loglikelihood = -np.inf
     theta_old = theta.copy()
 
     for r in range(max_iteration):
-        # 保存旧值（尽量少 copy：只在需要收敛判据时 copy）
+
         theta_old[:] = theta
 
         # E-step: X = A @ theta
         X = A @ theta
 
-        # 防止除零和 log(0)：clip 很关键
+
         X = np.clip(X, 1e-300, None)
 
-        # 核心提速：w = ns_hist / X，然后 g = A.T @ w
+
         w = ns_hist / X
         g = A.T @ w
 
@@ -244,21 +277,21 @@ def myEM_nosmooth_fast(n, ns_hist, transform, max_iteration, loglikelihood_thres
         theta *= g
         s = theta.sum()
         if s == 0.0:
-            # 极端数值异常保护：退回均匀（或你可选择 break）
+            #
             theta[:] = 1.0 / (n + 1)
         else:
             theta /= s
 
-        # 你的启发式修正逻辑（尽量不动）
+        #
         if r == 50 or r == 1000:
-            # 这里的 calSum / 逻辑我按原样保留调用位置
+            #
             if calSum(theta[:n]) < -0.3 and theta[int(n/2):n].sum() / theta[:n].sum() < 1/5:
                 theta[int(n/4):n] = 0.0
             elif calSum(theta[:n]) > 0.1:
                 theta[102] *= 0.5
             theta /= theta.sum()
 
-        # 约束噪声分量
+        # constraints on popular keys
         if theta[n] > 0.998:
             theta[n] = 0.998
             theta /= theta.sum()
@@ -279,13 +312,7 @@ def myEM_nosmooth_fast(n, ns_hist, transform, max_iteration, loglikelihood_thres
     return theta
 
 
-def calSum(vvvv):
-    vvvv = vvvv / sum(vvvv)
-    estimate_v_2 = 0
-    for i in range(pre_bins):
-        estimate_v_2 += vvvv[i] * i
-    estimate_v_2 = (estimate_v_2 / pre_bins - 0.5) * 2
-    return estimate_v_2
+
 
 
 def generateMatrix(eps, binNumber):
@@ -344,3 +371,10 @@ def generateMatrix(eps, binNumber):
     return transform
 
 
+def calSum(vvvv):
+    vvvv = vvvv / sum(vvvv)
+    estimate_v_2 = 0
+    for i in range(pre_bins):
+        estimate_v_2 += vvvv[i] * i
+    estimate_v_2 = (estimate_v_2 / pre_bins - 0.5) * 2
+    return estimate_v_2

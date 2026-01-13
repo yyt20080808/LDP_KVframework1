@@ -107,14 +107,8 @@ def padding_and_sampling(output_txt_path, fill_len=7, pad_start=50, missing_valu
                     candidates.append(next_pad)
                     next_pad += 1
 
-                # 如果该行 key 很多（>fill_len），这里就只在“真实存在的 key”里随机抽；
-                # 如果你希望“也从真实 key 中随机挑 fill_len 个再抽”，可以改成 random.sample(existing_indices, fill_len)
-                # 但按你描述：少于 7 才填充，所以这里保持简单合理的行为。
-
-                # 3) 从候选 7 个里随机选 1 个
                 chosen_index = random.choice(candidates)
 
-                # 4) 取值：空索引 / 不存在 => missing_value
                 if chosen_index >= pad_start:
                     chosen_value = missing_value
                 else:
@@ -126,13 +120,11 @@ def padding_and_sampling(output_txt_path, fill_len=7, pad_start=50, missing_valu
         print(f"错误: 文件 {FILE_PATH} 未找到。")
         return None
 
-    # 5) 聚合（和你原代码一致）
     grouped_data = defaultdict(list)
     for idx, val in users_data:
         grouped_data[idx].append(val)
 
-    # 6) 写出（和你原代码一致：每个 key 一行，行内用 \t{item} 串起来）
-    print(f"正在将数据以人类可读格式保存到: {output_txt_path}")
+    print(f"loading and : {output_txt_path}")
     try:
         with open(output_txt_path, 'w', encoding='utf-8') as f:
             for key in sorted(grouped_data.keys()):

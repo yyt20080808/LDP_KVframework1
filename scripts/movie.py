@@ -92,7 +92,7 @@ if __name__ == "__main__":
     pckv_data, padding_l = read_padding_file(k_pop_IDs, False)
     real_f_lists, real_mean_lists = read_true_statsics()
     keys = real_f_lists.keys()
-    n = 30
+    n = 3
     MEGRR_f, MEOLH_f, PCKVUE_f, JVEPM_f, ours_f = np.zeros((n, m)), np.zeros((n, m)), np.zeros((n, m)), np.zeros(
         (n, m)), np.zeros((n, m))
     MEGRR_v, MEOLH_v, PCKVUE_v, JVEPM_v, ours_v = np.zeros((n, m)), np.zeros((n, m)), np.zeros((n, m)), np.zeros(
@@ -111,12 +111,12 @@ if __name__ == "__main__":
             real_f = real_f_lists[idx]
             real_mean = real_mean_lists[idx]
             data = [data, [0 for _ in range(number_of_users - len(data))]]
-            mse_MEGRR_f, mse_MEGRR_v, mse_MEGRR_sum = pckv_GRR(data, epslions, mul_d=muld, real_f=real_f,
-                                                               real_mean=real_mean, paddinglength=padding_l)
-            mse_MEOLH_f, mse_MEOLH_v, mse_MEOLH_sum = hio(data, epslions, real_f=real_f, real_mean=real_mean,
-                                                          paddinglength=padding_l)
-            mse_PCKVUE_f, mse_PCKVUE_v, mse_PCKVUE_sum = pckv_UE(data, epslions, real_f=real_f, real_mean=real_mean,
-                                                                 paddinglength=padding_l)
+            # mse_MEGRR_f, mse_MEGRR_v, mse_MEGRR_sum = pckv_GRR(data, epslions, mul_d=muld, real_f=real_f,
+            #                                                    real_mean=real_mean, paddinglength=padding_l)
+            # mse_MEOLH_f, mse_MEOLH_v, mse_MEOLH_sum = hio(data, epslions, real_f=real_f, real_mean=real_mean,
+            #                                               paddinglength=padding_l)
+            # mse_PCKVUE_f, mse_PCKVUE_v, mse_PCKVUE_sum = pckv_UE(data, epslions, real_f=real_f, real_mean=real_mean,
+            #                                                      paddinglength=padding_l)
             data2 = our_data[idx]
             data2 = [data2, [0 for _ in range(number_of_users - len(data2))]]
             mse_SVE_f, mse_SVE_EM_v, mse_SVE_EM_sum, mse_rangeq = OURS_UE(data2, epslions, real_f=real_f,
@@ -124,17 +124,17 @@ if __name__ == "__main__":
                                                                           smooth=False)
 
             for j in range(len(epslions)):
-                MEGRR_f[i, j] = round(mse_MEGRR_f[j], 10)
-                MEGRR_v[i, j] = round(mse_MEGRR_v[j], 10)
-                MEGRR_sum[i, j] = round(mse_MEGRR_sum[j], 10)
-                # #
-                MEOLH_f[i, j] = round(mse_MEOLH_f[j], 10)
-                MEOLH_v[i, j] = round(mse_MEOLH_v[j], 10)
-                MEOLH_sum[i, j] = round(mse_MEOLH_sum[j], 10)
+                # MEGRR_f[i, j] = round(mse_MEGRR_f[j], 10)
+                # MEGRR_v[i, j] = round(mse_MEGRR_v[j], 10)
+                # MEGRR_sum[i, j] = round(mse_MEGRR_sum[j], 10)
+                # # #
+                # MEOLH_f[i, j] = round(mse_MEOLH_f[j], 10)
+                # MEOLH_v[i, j] = round(mse_MEOLH_v[j], 10)
+                # MEOLH_sum[i, j] = round(mse_MEOLH_sum[j], 10)
                 # # # # #
-                PCKVUE_f[i, j] = round(mse_PCKVUE_f[j], 10)
-                PCKVUE_v[i, j] = round(mse_PCKVUE_v[j], 10)
-                PCKVUE_sum[i, j] = round(mse_PCKVUE_sum[j], 10)
+                # PCKVUE_f[i, j] = round(mse_PCKVUE_f[j], 10)
+                # PCKVUE_v[i, j] = round(mse_PCKVUE_v[j], 10)
+                # PCKVUE_sum[i, j] = round(mse_PCKVUE_sum[j], 10)
 
                 # # # #
                 ours_f[i, j] = round(mse_SVE_f[j], 10)
