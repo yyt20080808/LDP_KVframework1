@@ -4,7 +4,7 @@ import random
 from collections import defaultdict,Counter
 import re
 # Step 1: Define the path to the CSV file
-file_path1 = 'test.csv'
+# file_path1 = 'test.csv'
 file_path2 = 'train.csv'
 
 # 2083778 records in totoal
@@ -60,7 +60,7 @@ def taxi_infor():
             pickup_loc_counter.update(zip(tmp["plon1"], tmp["plat1"]))
 
     # 分别处理 train / test
-    process_one_file(file_path1)
+    # process_one_file(file_path1)
     process_one_file(file_path2)
 
     # ========== 输出结果 ==========

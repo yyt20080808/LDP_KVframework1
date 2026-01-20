@@ -92,7 +92,7 @@ if __name__ == "__main__":
     pckv_data, padding_l = read_padding_file(k_pop_IDs, False)
     real_f_lists, real_mean_lists = read_true_statsics()
     keys = real_f_lists.keys()
-    n = 3
+    n = len(k_pop_IDs)
     MEGRR_f, MEOLH_f, PCKVUE_f, JVEPM_f, ours_f = np.zeros((n, m)), np.zeros((n, m)), np.zeros((n, m)), np.zeros(
         (n, m)), np.zeros((n, m))
     MEGRR_v, MEOLH_v, PCKVUE_v, JVEPM_v, ours_v = np.zeros((n, m)), np.zeros((n, m)), np.zeros((n, m)), np.zeros(

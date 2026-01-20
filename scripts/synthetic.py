@@ -48,10 +48,10 @@ if __name__ == "__main__":
     all_list = generate_Data("power-law")
     padding_l = 6
     number = 1000000
-    epslions = [0.25,0.5,1,1.5,2,3,4]
+    epslions = [1]#[0.25,0.5,1,1.5,2,3,4]
 
     m = len(epslions)
-    n = 50
+    n = 5
     MEGRR_f, MEOLH_f, PCKVUE_f, JVEPM_f, ours_f = np.zeros((n, m)), np.zeros((n, m)), np.zeros((n, m)), np.zeros(
         (n, m)), np.zeros((n, m))
     MEGRR_v, MEOLH_v, PCKVUE_v, JVEPM_v, ours_v = np.zeros((n, m)), np.zeros((n, m)), np.zeros((n, m)), np.zeros(
@@ -64,15 +64,15 @@ if __name__ == "__main__":
         newa = all_list[i]
         newb = [0 for _ in range(number - len(newa))]
         data = [newa, newb]
-        mse_MEGRR_f, mse_MEGRR_v, mse_MEGRR_sum = pckv_GRR(data, epslions, mul_d=100,paddinglength=padding_l)
+        # mse_MEGRR_f, mse_MEGRR_v, mse_MEGRR_sum = pckv_GRR(data, epslions, mul_d=100,paddinglength=padding_l)
         # mse_MEOLH_f, mse_MEOLH_v, mse_MEOLH_sum = hio(data, epslions,paddinglength=padding_l)
         # mse_PCKVUE_f, mse_PCKVUE_v, mse_PCKVUE_sum = pckv_UE(data, epslions,paddinglength=padding_l)
-        # mse_SVE_f, mse_SVE_EM_v, mse_SVE_EM_sum,res_range = OURS_UE(data, epslions,paddinglength=padding_l)
+        mse_SVE_f, mse_SVE_EM_v, mse_SVE_EM_sum,res_range = OURS_UE(data, epslions,paddinglength=padding_l)
     #
         for j in range(len(epslions)):
-            MEGRR_f[i, j] = round(mse_MEGRR_f[j], 10)
-            MEGRR_v[i, j] = round(mse_MEGRR_v[j], 10)
-            MEGRR_sum[i, j] = round(mse_MEGRR_sum[j], 10)
+            # MEGRR_f[i, j] = round(mse_MEGRR_f[j], 10)
+            # MEGRR_v[i, j] = round(mse_MEGRR_v[j], 10)
+            # MEGRR_sum[i, j] = round(mse_MEGRR_sum[j], 10)
     # #         # #
     #         MEOLH_f[i, j] = round(mse_MEOLH_f[j],10)
     #         MEOLH_v[i, j] = round(mse_MEOLH_v[j],10)
@@ -83,9 +83,9 @@ if __name__ == "__main__":
     #         PCKVUE_sum[i, j] = round(mse_PCKVUE_sum[j], 10)
 
     #         # # #
-    #         ours_f[i, j] = round(mse_SVE_f[j], 10)
-    #         ours_v[i, j] = round(mse_SVE_EM_v[j], 10)
-    #         ours_sum[i, j] = round(mse_SVE_EM_sum[j], 10)
+            ours_f[i, j] = round(mse_SVE_f[j], 10)
+            ours_v[i, j] = round(mse_SVE_EM_v[j], 10)
+            ours_sum[i, j] = round(mse_SVE_EM_sum[j], 10)
 
     np.set_printoptions(formatter={'all': lambda x: str(x) + ', '})
     print("\nMSE of frequency:")

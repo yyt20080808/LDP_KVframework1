@@ -77,8 +77,11 @@ def obstain_pop_set():
     real_dist = []
     index_dist = []
     epsilon = 2
+    ee = np.exp(epsilon)
+    std = 4*ee / (ee-1)**2 / 50000
+    print("std:", std)
     for i in range(280000):
-        if i in b and userset[i] > 50:
+        if i in b and userset[i] > 150:
             real_dist.append(userset[i])
             index_dist.append(i)
     print("real distribution ok!", len(real_dist))
@@ -87,8 +90,9 @@ def obstain_pop_set():
     est = lh_aggregate(noisy_samples, len(real_dist), epsilon)
     k_pop_IDs = []
     for k, v in enumerate(est):
-        if v > 0.005:
+        if v > max(0.005,3*std+50/200000):
             k_pop_IDs.append(index_dist[k])
+            print("k,v",k,v)
     print(k_pop_IDs)
     return k_pop_IDs
 
@@ -165,13 +169,13 @@ def padding_sampling_from_popularset(l=20, pop_ids=[1]):
 
 
 if __name__ == "__main__":
-    # k_pop_IDs = obstain_pop_set()
+    k_pop_IDs = obstain_pop_set()
 
-    k_pop_IDs = [1, 47, 50, 150, 216, 231, 256, 260, 296, 318, 349, 356, 480, 527, 593, 628, 661, 788, 858, 899, 919,
-                 953, 1036, 1073, 1210, 1235, 1617, 1721, 1884, 1917, 1923, 1968, 2020, 2571, 2694, 2871, 2959, 2997,
-                 3555, 4226, 4239, 4306, 4993, 5464, 5952, 7153, 8368, 8464, 30749, 48385, 53125, 56367, 57669, 79132,
-                 79702, 106487]
+    # k_pop_IDs = [1, 47, 50, 150, 216, 231, 256, 260, 296, 318, 349, 356, 480, 527, 593, 628, 661, 788, 858, 899, 919,
+    #              953, 1036, 1073, 1210, 1235, 1617, 1721, 1884, 1917, 1923, 1968, 2020, 2571, 2694, 2871, 2959, 2997,
+    #              3555, 4226, 4239, 4306, 4993, 5464, 5952, 7153, 8368, 8464, 30749, 48385, 53125, 56367, 57669, 79132,
+    #              79702, 106487]
     # l_star =  read_l(k_pop_IDs)
     # print(l_star)
-    l_star = 10
-    padding_sampling_from_popularset(l=l_star, pop_ids=k_pop_IDs)
+    # l_star = 10
+    # padding_sampling_from_popularset(l=l_star, pop_ids=k_pop_IDs)
