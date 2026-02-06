@@ -1,4 +1,4 @@
-# PrivECE: A Framework for Enhanced Conditional Estimation on Key-Value Data with Local Privacy Guarantees
+# PrivECE: Enhanced Conditional Estimation on Key-Value Data with Local Privacy Guarantees
 This repository provides the implementation of PrivECE, a novel framework for key-value data collection and analysis under pure Local Differential Privacy (LDP) guarantees.
 
 PrivECE focuses on accurate frequency estimation on keys and conditional estimation on values, and proposes an enhanced perturbation and aggregation framework compared with state-of-the-art (SOTA) LDP protocols.
