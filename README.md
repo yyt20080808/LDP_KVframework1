@@ -10,7 +10,7 @@ To run the experiments in this repo, you may need to use python3.8 or later vers
 This includes the implementations for estimating LDP noised reports generate from SOTA LDP protocols.
 - ` [PCKV](https://www.usenix.org/system/files/sec20-gu.pdf): Existing key-value protocols, for frequency estimation on key, and conditional mean estimation on value.
 
-Some FOs code is based on the implementation by [Wang](https://github.com/vvv214/LDP_Protocols) and [Maddock](https://github.com/Samuel-Maddock/pure-LDP/blob/master/README.md). And the estimating methods includes unbiased estimation, post-processing method([Basecut, Normsub](https://github.com/vvv214/LDP_Protocols/tree/master/post-process),[IIW](https://github.com/SEUNICK/LDP)), EM-based MLE and our MR.
+Some FOs code is based on the implementation by [Wang](https://github.com/vvv214/LDP_Protocols) and [Maddock](https://github.com/Samuel-Maddock/pure-LDP/blob/master/README.md). 
 
 ## File structure
 - `./datasets`: the source directory of all the datasets(e.g., Movie, Taxi), additionally, including the scripts of preparing padding and sampling steps.
