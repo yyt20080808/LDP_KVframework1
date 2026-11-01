@@ -7,11 +7,7 @@ The supplementary material for this paper is also available in this repository:
 ## Dependencies
 To run the experiments in this repo, you may need to use python3.8 or later version, you need to install package `numpy`, `xxhash`,`matplotlib`. 
 
-## Outline
-This includes the implementations for estimating LDP noised reports generate from SOTA LDP protocols.
-- ` [PCKV](https://www.usenix.org/system/files/sec20-gu.pdf): Existing key-value protocols, for frequency estimation on key, and conditional mean estimation on value.
 
-Some FOs code is based on the implementation by [Wang](https://github.com/vvv214/LDP_Protocols) and [Maddock](https://github.com/Samuel-Maddock/pure-LDP/blob/master/README.md). 
 
 ## File structure
 - `./datasets`: the source directory of all the datasets(e.g., Movie, Taxi), additionally, including the scripts of preparing padding and sampling steps.
